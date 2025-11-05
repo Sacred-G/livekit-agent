@@ -1,0 +1,258 @@
+"""
+Domain 4: Security Operations
+==============================
+Weight: 28% of exam (LARGEST DOMAIN)
+Official CompTIA Security+ SY0-701
+"""
+
+DOMAIN_4_KNOWLEDGE = {
+    "name": "Security Operations",
+    "weight": "28%",
+    "topics": {
+        "security_techniques": {
+            "description": "Applying security techniques across systems",
+            "secure_baselines": [
+                "Establish - Create security standards",
+                "Deploy - Implement across systems",
+                "Maintain - Keep configurations current",
+            ],
+            "hardening_targets": [
+                "Mobile Devices - Smartphones and tablets",
+                "Workstations - Desktop and laptop computers",
+                "Network Infrastructure - Switches and routers",
+                "Cloud Infrastructure - Cloud-based resources",
+                "Servers - Application and database servers",
+                "ICS/SCADA - Industrial control systems",
+                "RTOS - Real-Time Operating Systems",
+                "IoT Devices - Internet of Things endpoints",
+                "Embedded Systems - Purpose-built devices",
+            ],
+            "wireless_security": [
+                "Site Surveys - RF analysis and planning",
+                "Heat Maps - Wireless coverage visualization",
+                "WPA3 - Latest Wi-Fi security standard",
+                "AAA/RADIUS - Authentication infrastructure",
+                "EAP-TLS - Certificate-based authentication",
+                "PEAP - Protected EAP with password",
+                "Captive Portals - Web-based authentication",
+            ],
+            "application_security": [
+                "Input Validation - Sanitizing user input",
+                "Secure Cookies - HttpOnly, Secure flags",
+                "Static Code Analysis - Reviewing source code",
+                "Dynamic Code Analysis - Testing running applications",
+                "Code Signing - Verifying software authenticity",
+                "Sandboxing - Isolated execution environment",
+            ],
+            "monitoring": [
+                "Security Monitoring - Continuous surveillance",
+                "Performance Monitoring - Resource utilization",
+                "Log Monitoring - Event analysis",
+            ],
+            "key_points": [
+                "Hardening reduces attack surface",
+                "Baseline configurations ensure consistency",
+                "Defense in depth across all system types",
+            ],
+        },
+        "asset_management": {
+            "description": "Managing organizational assets throughout lifecycle",
+            "lifecycle_phases": [
+                "Acquisition/Procurement - Purchasing assets",
+                "Assignment/Accounting - Tracking ownership",
+                "Monitoring/Asset Tracking - Location and status",
+                "Disposal/Decommissioning - Secure retirement",
+            ],
+            "asset_tracking": [
+                "Asset Inventory - Comprehensive asset lists",
+                "Asset Tags - Physical identification",
+                "Configuration Management Database (CMDB) - Asset records",
+            ],
+            "key_points": [
+                "Know what you have to protect it",
+                "Track assets from cradle to grave",
+                "Proper disposal prevents data leakage",
+            ],
+        },
+        "vulnerability_management": {
+            "description": "Identifying and remediating vulnerabilities",
+            "identification": [
+                "Vulnerability Scans - Automated scanning",
+                "Application Security Testing - Code and runtime analysis",
+                "Threat Feed/OSINT - External intelligence sources",
+                "Penetration Testing - Simulated attacks",
+                "Responsible Disclosure - Security researcher reports",
+            ],
+            "analysis": [
+                "Confirmation - Validating findings",
+                "False Positive - Incorrectly identified vulnerability",
+                "False Negative - Missed vulnerability",
+                "Prioritization - Risk-based ranking",
+                "Common Vulnerability Scoring System (CVSS) - Severity rating",
+                "Common Vulnerabilities and Exposures (CVE) - Vulnerability database",
+                "Vulnerability Classification - Categorizing findings",
+                "Exposure Factor - Potential loss percentage",
+            ],
+            "response_remediation": [
+                "Patching - Applying security updates",
+                "Insurance - Risk transfer mechanism",
+                "Segmentation - Network isolation",
+                "Compensating Controls - Alternative mitigations",
+                "Exceptions/Exemptions - Documented risk acceptance",
+            ],
+            "validation": [
+                "Rescanning - Verification scanning",
+                "Audit - Independent review",
+            ],
+            "reporting": [
+                "Stakeholder Communication - Executive and technical reporting",
+                "Metrics and KPIs - Performance indicators",
+                "Trend Analysis - Vulnerability patterns over time",
+            ],
+            "key_points": [
+                "Vulnerability management is continuous process",
+                "Prioritize based on risk, not just CVSS",
+                "Validate remediation with rescanning",
+            ],
+        },
+        "security_alerting_monitoring": {
+            "description": "Security monitoring and alerting capabilities",
+            "monitoring_activities": [
+                "Log Aggregation - Centralized log collection",
+                "Alerting - Automated notifications",
+                "Scanning - Continuous security scanning",
+                "Reporting - Security status reports",
+                "Archiving - Long-term log retention",
+                "Alert Response - Investigating notifications",
+                "Quarantine - Isolating suspicious items",
+            ],
+            "monitoring_resources": [
+                "SIEM - Security Information and Event Management",
+                "SCAP - Security Content Automation Protocol",
+                "Antivirus/Anti-malware - Malware detection",
+                "Data Loss Prevention (DLP) - Data exfiltration prevention",
+                "SNMP Traps - Network device alerts",
+                "NetFlow/sFlow - Traffic flow analysis",
+                "Vulnerability Scanners - Automated security scanning",
+            ],
+            "key_points": [
+                "SIEM correlates events from multiple sources",
+                "Alert fatigue reduces with proper tuning",
+                "Long-term log retention supports forensics",
+            ],
+        },
+        "identity_access_management": {
+            "description": "Managing identities and controlling access",
+            "provisioning": [
+                "Provisioning - Creating accounts",
+                "De-provisioning - Removing accounts",
+                "Permission Assignment - Granting rights",
+                "Identity Proofing - Verifying identity",
+                "Interoperability - Cross-system access",
+            ],
+            "federation_sso": [
+                "Federation - Trusted identity relationships",
+                "Single Sign-On (SSO) - One login, multiple systems",
+                "LDAP - Lightweight Directory Access Protocol",
+                "OAuth - Authorization delegation",
+                "SAML - Security Assertion Markup Language",
+            ],
+            "access_control_models": [
+                "Mandatory Access Control (MAC) - System-enforced labels",
+                "Discretionary Access Control (DAC) - Owner-controlled",
+                "Role-Based Access Control (RBAC) - Based on job role",
+                "Rule-Based Access Control - Conditional access",
+                "Attribute-Based Access Control (ABAC) - Policy-driven",
+                "Time-of-day Restrictions - Temporal access control",
+                "Least Privilege - Minimum necessary access",
+            ],
+            "multifactor_authentication": [
+                "Biometrics - Fingerprint, facial recognition",
+                "Hard Tokens - Physical security keys",
+                "Soft Tokens - Software-based tokens (authenticator apps)",
+                "Security Keys - FIDO2/WebAuthn devices",
+            ],
+            "password_concepts": [
+                "Password Best Practices - Length, complexity, rotation",
+                "Passwordless Authentication - Biometrics, security keys",
+                "Password Managers - Secure password storage",
+                "Password Policies - Organizational requirements",
+            ],
+            "privileged_access": [
+                "Privileged Access Management (PAM) - Admin account control",
+                "Just-in-Time Permissions - Temporary elevated access",
+                "Password Vaulting - Secure credential storage",
+                "Ephemeral Credentials - Short-lived access",
+            ],
+            "key_points": [
+                "De-provisioning is critical for terminated employees",
+                "MFA significantly reduces account compromise",
+                "Least privilege limits damage from compromise",
+                "Federation enables secure cross-organization access",
+            ],
+        },
+        "modifying_enterprise_capabilities": {
+            "description": "Automation, orchestration, and incident response",
+            "automation_orchestration": [
+                "User Provisioning - Automated account creation",
+                "Resource Provisioning - Automated infrastructure deployment",
+                "Guard Rails - Automated policy enforcement",
+                "Security Groups - Automated access management",
+                "Ticket Creation - Automated incident tracking",
+                "Escalation - Automated alert routing",
+                "Enabling/Disabling Services - Automated response actions",
+                "Continuous Integration/Continuous Deployment (CI/CD) - Automated software delivery",
+                "Integrations and APIs - System interconnections",
+            ],
+            "incident_response_process": [
+                "Preparation - Planning and readiness",
+                "Detection - Identifying incidents",
+                "Analysis - Understanding the incident",
+                "Containment - Limiting spread and damage",
+                "Eradication - Removing threat from environment",
+                "Recovery - Restoring normal operations",
+                "Lessons Learned - Post-incident review",
+            ],
+            "incident_response_activities": [
+                "Training - Staff preparedness",
+                "Testing - IR plan validation (tabletop, walkthrough, simulation)",
+                "Root Cause Analysis - Identifying underlying issues",
+                "Threat Hunting - Proactive threat search",
+                "Digital Forensics - Evidence collection and analysis",
+            ],
+            "key_points": [
+                "Automation reduces response time",
+                "Incident response is structured process",
+                "Lessons learned improve future response",
+                "Threat hunting is proactive security",
+            ],
+        },
+        "data_sources": {
+            "description": "Utilizing security data sources for analysis",
+            "log_data": [
+                "Firewall Logs - Network traffic records",
+                "Application Logs - Application-level events",
+                "Endpoint Logs - Host-based events",
+                "OS-specific Security Logs - Windows Event Log, syslog",
+                "IPS/IDS Logs - Intrusion detection events",
+                "Network Logs - Switch, router, access point logs",
+                "Metadata - Data about data (file properties, email headers)",
+            ],
+            "vulnerability_data": [
+                "Vulnerability Scans - Automated security assessments",
+                "Automated Reports - Scheduled scan results",
+                "Dashboards - Visual security metrics",
+            ],
+            "network_analysis": [
+                "Packet Captures (PCAP) - Full network traffic recording",
+                "NetFlow/sFlow - Network flow metadata",
+                "Protocol Analyzers - Deep packet inspection",
+            ],
+            "key_points": [
+                "Multiple data sources provide complete picture",
+                "Log correlation identifies complex attacks",
+                "Packet captures essential for detailed analysis",
+            ],
+        },
+    },
+}

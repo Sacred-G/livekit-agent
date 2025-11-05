@@ -8,29 +8,40 @@ An interactive voice AI agent built with LiveKit that helps students prepare for
 
 The agent includes detailed coverage of all five Security+ exam domains:
 
-1. **Threats, Attacks, and Vulnerabilities (24%)**
-   - Malware types (viruses, worms, trojans, ransomware, etc.)
-   - Social engineering attacks (phishing, vishing, pretexting, etc.)
-   - Attack types (DoS/DDoS, MitM, SQL injection, XSS, etc.)
+1. **General Security Concepts (12%)**
+   - Security controls (technical, managerial, operational, physical)
+   - Fundamental security concepts (CIA Triad, non-repudiation, AAA, Zero Trust)
+   - Change management processes
+   - Cryptographic solutions (PKI, encryption, hashing, certificates)
 
-2. **Architecture and Design (21%)**
-   - Security concepts (CIA triad, defense in depth, least privilege)
-   - Network design (DMZ, VLANs, zero trust)
-   - Cloud security (IaaS, PaaS, SaaS, shared responsibility)
+2. **Threats, Vulnerabilities, and Mitigations (22%)**
+   - Threat actors and motivations (nation-state, hacktivist, insider, organized crime)
+   - Threat vectors and attack surfaces (email, SMS, social engineering, supply chain)
+   - Vulnerability types (application, OS, hardware, cloud-specific, zero-day)
+   - Indicators of malicious activity (malware, attacks, password attacks)
+   - Mitigation techniques (segmentation, access control, patching, encryption)
 
-3. **Implementation (25%)**
-   - Cryptography (symmetric, asymmetric, hashing, PKI)
-   - Authentication methods (MFA, SSO, Kerberos)
-   - Wireless security (WPA2, WPA3, avoiding WEP)
+3. **Security Architecture (18%)**
+   - Security implications of architecture models (cloud, hybrid, IoT, ICS/SCADA)
+   - Security principles for enterprise infrastructure (device placement, security zones)
+   - Data protection methods (encryption, hashing, masking, tokenization)
+   - Resilience and recovery (high availability, backups, disaster recovery)
 
-4. **Operations and Incident Response (16%)**
-   - Incident response phases (Preparation → Identification → Containment → Eradication → Recovery → Lessons Learned)
-   - Security monitoring (SIEM, IDS/IPS)
+4. **Security Operations (28%)**
+   - Security techniques (hardening, wireless security, application security)
+   - Asset management (acquisition, monitoring, disposal)
+   - Vulnerability management (scanning, analysis, remediation)
+   - Security alerting and monitoring (SIEM, IDS/IPS, log aggregation)
+   - Identity and access management (provisioning, MFA, access controls)
+   - Modifying enterprise capabilities (automation, incident response)
+   - Using data sources (logs, vulnerability scans, packet captures)
 
-5. **Governance, Risk, and Compliance (14%)**
-   - Security policies and procedures
-   - Risk management (SLE, ARO, ALE)
-   - Risk response strategies
+5. **Security Program Management and Oversight (20%)**
+   - Security governance (policies, standards, procedures)
+   - Risk management (assessment, BIA, RTO/RPO, risk response strategies)
+   - Third-party risk management (vendor assessment, agreements, monitoring)
+   - Compliance and monitoring (reporting, audits, privacy)
+   - Security awareness and training (phishing campaigns, user guidance)
 
 ### 🎯 Interactive Functions
 
@@ -102,7 +113,7 @@ Each topic includes:
 1. **Understand, Don't Memorize** - Focus on understanding WHY security measures are important
 2. **Use Acronyms** - CIA (Confidentiality, Integrity, Availability), AAA (Authentication, Authorization, Accounting)
 3. **Practice Hands-On** - Set up virtual labs to practice concepts
-4. **Focus on High-Weight Domains** - Implementation (25%) and Threats (24%) are the largest
+4. **Focus on High-Weight Domains** - Security Operations (28%) and Security Program Management (20%) are the largest
 5. **Read Carefully** - Watch for keywords like "BEST", "MOST", "FIRST" on the exam
 
 ## Exam Information

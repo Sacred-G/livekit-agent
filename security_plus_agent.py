@@ -11,7 +11,10 @@ from livekit.agents.llm import function_tool
 from livekit.plugins import openai, deepgram, silero
 import os
 import random
+from domains import ALL_DOMAINS
+from security_plus_knowledge_base import PRACTICE_QUESTIONS
 
+# Load environment variables
 load_dotenv(".env")
 
 class SecurityPlusTeacher(Agent):
@@ -19,320 +22,115 @@ class SecurityPlusTeacher(Agent):
 
     def __init__(self):
         super().__init__(
-            instructions="""You are an expert Security+ exam instructor helping students prepare for CompTIA Security+ certification.
-            
-            Your role is to:
-            - Explain security concepts clearly and concisely
-            - Provide examples and real-world scenarios
-            - Quiz students on exam topics
-            - Track their progress and identify weak areas
-            - Offer study tips and exam strategies
-            
-            Keep responses conversational and encouraging. Break down complex topics into digestible pieces."""
-        )
+            instructions="""
+You are a certified CompTIA Security+ instructor conducting an engaging, voice-based class.  
+You are beginning a live CompTIA Security+ class. Introduce yourself as the instructor and start the first session naturally, just as a real teacher would at the beginning of a course. Speak with warmth, confidence, and clear pacing.
 
-        # Initialize knowledge base and tracking
-        self._init_knowledge_base()
-        self._init_practice_questions()
+Your introduction should:
+1. Greet the class naturally. Vary how you open each time (examples: "Good morning everyone", "Hey folks, welcome in", "Alright team, let's get started").
+2. Introduce yourself as their Security+ instructor and mention that you'll be guiding them through the certification topics.
+3. Briefly explain what today's session will cover — keep it conversational, not scripted.
+4. Set expectations: mention note-taking, participation, and pacing.
+5. Add small, human details that sound spontaneous ("Let me grab a sip of water", "If you have a notebook handy, go ahead and open it").
+6. Use natural pauses and phrasing cues like [break:1s] and [break:2s] to allow for realism in delivery.
+7. End your introduction by smoothly transitioning into the first topic — don't sound robotic or read off bullet points.
+
+Example pattern (do not repeat exactly):
+"Good morning, everyone! [break:1s] My name is Alex, and I'll be your instructor for the CompTIA Security+ course. I'm really excited to walk you through some core cybersecurity concepts — we'll break things down piece by piece, and I promise to keep it approachable. [break:1s] Today, we'll start with the fundamentals: understanding what security actually means, and the principles that guide it — confidentiality, integrity, and availability. [break:1s] Make sure you've got a way to take notes; I'll pause along the way so you can jot down the key points. [break:2s] Alright, let's dive in."
+
+Tone Guidelines:
+- Never sound like you're reading a script.
+- Vary your openings, word choices, and transitions each time.
+- Be conversational, approachable, and adaptive — sound human.
+- Keep your energy calm but confident, and your explanations clear.
+- Speak at a steady, natural pace; avoid rushing or monotone delivery.
+
+
+Instructor Personality
+- Speak conversationally and naturally, like a real teacher in front of a classroom.
+- Be patient, encouraging, and confident.
+- Vary your tone and rhythm to keep the audience's attention.
+- Address the class occasionally ("everyone", "folks", "team") to create presence.
+- Avoid robotic repetition — change how you open, explain, pause, and summarize each time.
+
+Teaching Flow (Flexible)
+Instead of following a rigid pattern, alternate between different structures.  
+Use these as interchangeable approaches so lessons stay fresh:
+
+A) Classic Flow:
+1. Introduce the topic and explain why it matters.
+2. Cover 2–3 major points with clear explanations.
+3. Insert a short pause for note-taking: [break:1.5s]
+4. Ask for understanding or reflection: [checkpoint]
+5. Provide a scenario or story.
+6. Recap with practical takeaways: [recap]
+
+B) Example-First Flow:
+1. Start with a short real-world scenario or story.
+2. Ask the students to think about what they would do.
+3. Explain the core concept that applies to that example.
+4. Pause briefly: [break:1.5s]
+5. Add an exam connection or memory cue: [exam]
+6. Summarize with the main lesson point.
+
+C) Interactive Flow:
+1. Ask a question to spark curiosity.
+2. Explain the concept piece by piece, answering your own question.
+3. Insert mini-pauses between points: [break:1s]
+4. Offer a "think about this" moment: [checkpoint]
+5. End with a short recap or exam-style tip.
+
+Adaptive Teaching
+- Rephrase difficult ideas in simpler language if the topic is dense.
+- Use analogies, comparisons, and relatable examples.
+- Reinforce learning by saying: "Let's look at that another way," or "Here's a different example."
+- Acknowledge confusion gently and re-explain with patience.
+- Use natural transitions like "Before we wrap up..." or "Let's take another angle."
+
+Scenario and Storytelling
+- Use realistic cybersecurity situations ("Imagine a small business hit by ransomware...").
+- Reference job roles and decision-making contexts (analyst, sysadmin, SOC lead).
+- When introducing examples, vary openings ("Let's consider a case where..." / "Picture this scenario...").
+
+Exam Connection
+- Mention relevant Security+ domains (e.g., Domain 1.2, control types).
+- Use [exam] before exam-related hints for later highlighting.
+- Offer different memory strategies each time: mnemonics, contrasts, or associations.
+
+Voice and Timing Cues
+- Speak at a natural pace with deliberate pauses.
+- Use [break:1s] or [break:2s] for silence and reflection.
+- Use [emph] and [/emph] to mark emphasis.
+- Use [slow] and [/slow] when defining or quoting critical terms.
+- Randomize transitions — don't always start with "Okay" or "Next."  
+  Try alternatives like "Let's dive in," "Here's what matters most," or "Let's step through it slowly."
+
+Classroom Energy
+- Encourage students regularly ("Good question,", "Excellent observation,", "That's an important point.")
+- Comment on progress with variation ("We're halfway through this concept,", "That was a big one, nice job.")
+- Occasionally recap earlier material for continuity.
+
+Guardrails
+- Avoid predictable speech patterns.
+- Mix short, punchy explanations with longer, reflective ones.
+- After every concept, allow time for note-taking or questions.
+- Keep lessons concise and human — your goal is mastery, not memorization.
+
+Your mission: Deliver each session with authenticity and variety.  
+Vary structure, tone, and pacing naturally so the class feels spontaneous and real.
+"""
+)
+
+
+
+        # Initialize knowledge base and tracking from imported data
+        self.knowledge_base = ALL_DOMAINS
+        self.practice_questions = PRACTICE_QUESTIONS
         self.student_progress = {
             "questions_answered": 0,
             "correct_answers": 0,
             "topics_covered": set()
         }
-
-    def _init_knowledge_base(self):
-        """Initialize the Security+ knowledge base."""
-        self.knowledge_base = {
-            "domain_1": {
-                "name": "Threats, Attacks, and Vulnerabilities",
-                "weight": "24%",
-                "topics": {
-                    "malware": {
-                        "description": "Malicious software designed to harm or exploit systems",
-                        "types": [
-                            "Virus - Attaches to files and spreads when executed",
-                            "Worm - Self-replicating malware that spreads without user action",
-                            "Trojan - Disguises itself as legitimate software",
-                            "Ransomware - Encrypts data and demands payment",
-                            "Spyware - Secretly monitors user activity",
-                            "Rootkit - Hides malware presence at system level"
-                        ],
-                        "key_points": [
-                            "Worms self-replicate, viruses need execution",
-                            "Ransomware is a major threat to organizations",
-                            "Rootkits are difficult to detect"
-                        ]
-                    },
-                    "social_engineering": {
-                        "description": "Psychological manipulation to trick users",
-                        "types": [
-                            "Phishing - Fraudulent emails requesting information",
-                            "Spear Phishing - Targeted phishing attacks",
-                            "Whaling - Phishing targeting executives",
-                            "Vishing - Voice phishing via phone",
-                            "Smishing - SMS phishing",
-                            "Pretexting - Creating false scenarios",
-                            "Tailgating - Following into secure areas"
-                        ],
-                        "key_points": [
-                            "Exploits human psychology, not technical flaws",
-                            "User awareness training is best defense",
-                            "Always verify requests for sensitive data"
-                        ]
-                    },
-                    "attacks": {
-                        "description": "Common attack methods",
-                        "types": [
-                            "DoS/DDoS - Overwhelming systems with traffic",
-                            "Man-in-the-Middle - Intercepting communications",
-                            "SQL Injection - Malicious SQL code insertion",
-                            "XSS - Cross-Site Scripting attacks",
-                            "Password Attacks - Brute force, dictionary",
-                            "Zero-Day - Exploiting unknown vulnerabilities"
-                        ],
-                        "key_points": [
-                            "DDoS uses multiple sources",
-                            "Injection attacks target input validation",
-                            "Zero-days have no patches available"
-                        ]
-                    }
-                }
-            },
-            "domain_2": {
-                "name": "Architecture and Design",
-                "weight": "21%",
-                "topics": {
-                    "security_concepts": {
-                        "description": "Fundamental security principles",
-                        "concepts": [
-                            "CIA Triad - Confidentiality, Integrity, Availability",
-                            "Non-repudiation - Proof that cannot be denied",
-                            "Authentication - Verifying identity",
-                            "Authorization - Granting access rights",
-                            "Defense in Depth - Multiple security layers",
-                            "Least Privilege - Minimum necessary access"
-                        ],
-                        "key_points": [
-                            "CIA Triad is foundation of security",
-                            "AAA: Authentication, Authorization, Accounting",
-                            "Defense in depth uses layered security"
-                        ]
-                    },
-                    "network_design": {
-                        "description": "Secure network architecture",
-                        "concepts": [
-                            "DMZ - Demilitarized zone for public services",
-                            "VLANs - Virtual LANs for segmentation",
-                            "NAT - Network Address Translation",
-                            "Zero Trust - Never trust, always verify",
-                            "Network Segmentation - Isolating portions"
-                        ],
-                        "key_points": [
-                            "DMZ protects internal network",
-                            "Segmentation limits lateral movement",
-                            "Zero trust assumes breach"
-                        ]
-                    },
-                    "cloud_security": {
-                        "description": "Cloud computing security",
-                        "concepts": [
-                            "IaaS - Infrastructure as a Service",
-                            "PaaS - Platform as a Service",
-                            "SaaS - Software as a Service",
-                            "Shared Responsibility Model"
-                        ],
-                        "key_points": [
-                            "Security responsibilities vary by model",
-                            "Provider handles physical security",
-                            "Customer responsible for data"
-                        ]
-                    }
-                }
-            },
-            "domain_3": {
-                "name": "Implementation",
-                "weight": "25%",
-                "topics": {
-                    "cryptography": {
-                        "description": "Encryption and cryptographic concepts",
-                        "concepts": [
-                            "Symmetric - Same key (AES, DES)",
-                            "Asymmetric - Public/private keys (RSA, ECC)",
-                            "Hashing - One-way function (SHA-256)",
-                            "Digital Signatures - Verify authenticity",
-                            "PKI - Public Key Infrastructure",
-                            "SSL/TLS - Secure communication"
-                        ],
-                        "key_points": [
-                            "Symmetric is fast, asymmetric is secure",
-                            "Hashing is one-way, encryption is two-way",
-                            "Digital signatures use private key"
-                        ]
-                    },
-                    "authentication": {
-                        "description": "Identity verification methods",
-                        "concepts": [
-                            "Something You Know - Password, PIN",
-                            "Something You Have - Token, smart card",
-                            "Something You Are - Biometrics",
-                            "MFA - Multi-Factor Authentication",
-                            "SSO - Single Sign-On",
-                            "Kerberos - Ticket-based authentication"
-                        ],
-                        "key_points": [
-                            "MFA significantly improves security",
-                            "Biometrics have error rates",
-                            "Kerberos uses tickets"
-                        ]
-                    },
-                    "wireless_security": {
-                        "description": "Securing wireless networks",
-                        "protocols": [
-                            "WEP - Deprecated, insecure",
-                            "WPA - Wi-Fi Protected Access",
-                            "WPA2 - Uses AES encryption",
-                            "WPA3 - Latest standard"
-                        ],
-                        "key_points": [
-                            "Never use WEP",
-                            "WPA2 with AES is minimum",
-                            "WPA3 provides enhanced protection"
-                        ]
-                    }
-                }
-            },
-            "domain_4": {
-                "name": "Operations and Incident Response",
-                "weight": "16%",
-                "topics": {
-                    "incident_response": {
-                        "description": "Handling security incidents",
-                        "phases": [
-                            "1. Preparation",
-                            "2. Identification",
-                            "3. Containment",
-                            "4. Eradication",
-                            "5. Recovery",
-                            "6. Lessons Learned"
-                        ],
-                        "key_points": [
-                            "Follow structured process",
-                            "Document everything",
-                            "Containment prevents damage"
-                        ]
-                    },
-                    "monitoring": {
-                        "description": "Security monitoring",
-                        "tools": [
-                            "SIEM - Security Information and Event Management",
-                            "IDS - Intrusion Detection (passive)",
-                            "IPS - Intrusion Prevention (active)",
-                            "Log Aggregation"
-                        ],
-                        "key_points": [
-                            "SIEM correlates events",
-                            "IDS detects, IPS prevents",
-                            "Logging essential for forensics"
-                        ]
-                    }
-                }
-            },
-            "domain_5": {
-                "name": "Governance, Risk, and Compliance",
-                "weight": "14%",
-                "topics": {
-                    "policies": {
-                        "description": "Security policies and procedures",
-                        "types": [
-                            "AUP - Acceptable Use Policy",
-                            "Password Policy",
-                            "Data Classification",
-                            "Change Management",
-                            "Business Continuity",
-                            "Disaster Recovery"
-                        ],
-                        "key_points": [
-                            "Policies define what",
-                            "Procedures define how",
-                            "Standards define requirements"
-                        ]
-                    },
-                    "risk_management": {
-                        "description": "Managing risks",
-                        "concepts": [
-                            "Risk Assessment",
-                            "SLE - Single Loss Expectancy",
-                            "ARO - Annual Rate of Occurrence",
-                            "ALE - Annual Loss Expectancy",
-                            "Risk Mitigation",
-                            "Risk Transference",
-                            "Risk Acceptance",
-                            "Risk Avoidance"
-                        ],
-                        "key_points": [
-                            "Risk cannot be eliminated",
-                            "ALE = SLE × ARO",
-                            "Choose appropriate response"
-                        ]
-                    }
-                }
-            }
-        }
-
-    def _init_practice_questions(self):
-        """Initialize practice questions."""
-        self.practice_questions = [
-            {
-                "question": "Which malware can replicate without user interaction?",
-                "options": ["A) Virus", "B) Worm", "C) Trojan", "D) Rootkit"],
-                "correct": "B",
-                "explanation": "Worms self-replicate and spread across networks without user action."
-            },
-            {
-                "question": "What does CIA triad stand for?",
-                "options": ["A) Confidentiality, Integrity, Availability", "B) Control, Identity, Access", 
-                           "C) Cryptography, Identification, Authentication", "D) Compliance, Investigation, Analysis"],
-                "correct": "A",
-                "explanation": "CIA Triad: Confidentiality, Integrity, and Availability - foundation of information security."
-            },
-            {
-                "question": "Which encryption uses the same key for encrypt and decrypt?",
-                "options": ["A) Asymmetric", "B) Symmetric", "C) Hashing", "D) Public key"],
-                "correct": "B",
-                "explanation": "Symmetric encryption uses same key for both operations. Fast but requires secure key distribution."
-            },
-            {
-                "question": "What is the first phase of incident response?",
-                "options": ["A) Containment", "B) Identification", "C) Preparation", "D) Eradication"],
-                "correct": "C",
-                "explanation": "Preparation is first - develop IR plan, train team, prepare tools before incidents occur."
-            },
-            {
-                "question": "Which wireless protocol should NOT be used?",
-                "options": ["A) WPA2", "B) WPA3", "C) WEP", "D) WPA"],
-                "correct": "C",
-                "explanation": "WEP is deprecated and easily cracked. Never use it. WPA2 or WPA3 are current standards."
-            },
-            {
-                "question": "What attack intercepts communication between two parties?",
-                "options": ["A) DoS", "B) Man-in-the-Middle", "C) Phishing", "D) SQL Injection"],
-                "correct": "B",
-                "explanation": "Man-in-the-Middle attacks secretly intercept and potentially alter communications."
-            },
-            {
-                "question": "Which access control uses labels and clearances?",
-                "options": ["A) DAC", "B) RBAC", "C) MAC", "D) ABAC"],
-                "correct": "C",
-                "explanation": "Mandatory Access Control (MAC) uses security labels and clearances. Most restrictive, used in military."
-            },
-            {
-                "question": "What does MFA stand for?",
-                "options": ["A) Multiple Factor Authentication", "B) Multi-Factor Authentication", 
-                           "C) Managed File Access", "D) Mandatory Factor Authorization"],
-                "correct": "B",
-                "explanation": "Multi-Factor Authentication requires two or more factors from different categories to verify identity."
-            }
-        ]
 
     @function_tool
     async def get_exam_overview(self, context: RunContext) -> str:
@@ -372,25 +170,23 @@ class SecurityPlusTeacher(Agent):
         self.student_progress["topics_covered"].add(f"{domain}_{topic}")
         
         explanation = f"📚 {topic.replace('_', ' ').title()}\n\n"
-        explanation += f"{topic_data['description']}\n\n"
+        explanation += f"{topic_data.get('description', '')}\n\n"
         
-        if "types" in topic_data:
-            explanation += "Types:\n"
-            for item in topic_data["types"][:4]:
-                explanation += f"• {item}\n"
-        
-        if "concepts" in topic_data:
-            explanation += "Concepts:\n"
-            for item in topic_data["concepts"][:4]:
-                explanation += f"• {item}\n"
-        
-        if "phases" in topic_data:
-            explanation += "Phases:\n"
-            for item in topic_data["phases"]:
-                explanation += f"• {item}\n"
+        # Iterate through all fields except description and key_points
+        for field_name, field_data in topic_data.items():
+            if field_name in ["description", "key_points"]:
+                continue
+            
+            if isinstance(field_data, list):
+                # Format field name for display
+                display_name = field_name.replace("_", " ").title()
+                explanation += f"{display_name}:\n"
+                for item in field_data[:6]:  # Show up to 6 items
+                    explanation += f"• {item}\n"
+                explanation += "\n"
         
         if "key_points" in topic_data:
-            explanation += "\n🎯 Key Points:\n"
+            explanation += "🎯 Key Points:\n"
             for point in topic_data["key_points"]:
                 explanation += f"• {point}\n"
         
@@ -415,6 +211,97 @@ class SecurityPlusTeacher(Agent):
             result += f"• {topic_key}: {topic_data['description']}\n"
         
         return result
+
+    @function_tool
+    async def teach_lesson(self, context: RunContext, domain: str, topic: str) -> str:
+        """Start a structured lesson on a specific topic with teaching format.
+        
+        Args:
+            domain: Domain number (domain_1 through domain_5)
+            topic: Topic name (e.g., malware, cryptography)
+        """
+        domain = domain.lower().replace(" ", "_")
+        topic = topic.lower().replace(" ", "_")
+        
+        if domain not in self.knowledge_base:
+            return "Use domain_1 through domain_5"
+        
+        domain_data = self.knowledge_base[domain]
+        
+        if topic not in domain_data["topics"]:
+            available = ", ".join(domain_data["topics"].keys())
+            return f"Available topics: {available}"
+        
+        topic_data = domain_data["topics"][topic]
+        self.student_progress["topics_covered"].add(f"{domain}_{topic}")
+        
+        lesson = f"📚 Today's Lesson: {topic.replace('_', ' ').title()}\n\n"
+        lesson += f"Alright class, today we're going to cover {topic.replace('_', ' ')}. This is an important topic for your Security+ exam.\n\n"
+        lesson += f"Let me start with the fundamentals. {topic_data.get('description', '')}\n\n"
+        lesson += "Let me pause here for a moment so you can write that down.\n\n"
+        
+        # Iterate through all list fields except key_points
+        field_count = 0
+        for field_name, field_data in topic_data.items():
+            if field_name in ["description", "key_points"] or not isinstance(field_data, list):
+                continue
+            
+            field_count += 1
+            display_name = field_name.replace("_", " ")
+            
+            if field_count == 1:
+                lesson += f"Now, let me walk you through the {display_name} you need to know:\n\n"
+            else:
+                lesson += f"Next, let's look at the {display_name}:\n\n"
+            
+            for i, item in enumerate(field_data[:5], 1):  # Show up to 5 items
+                lesson += f"{i}. {item}\n"
+            lesson += "\nTake a moment to note these down. These are exam favorites.\n\n"
+        
+        if "key_points" in topic_data:
+            lesson += "🎯 Here are the critical points you absolutely must remember:\n\n"
+            for point in topic_data["key_points"]:
+                lesson += f"• {point}\n"
+            lesson += "\nThese often appear on the exam, so highlight them in your notes.\n\n"
+        
+        lesson += "Now, before we move on - do you have any questions about what we've covered so far?"
+        
+        return lesson
+
+    @function_tool
+    async def deliver_scripted_lesson(self, context: RunContext, domain: str, topic: str) -> str:
+        """Deliver a pre-written scripted lesson for a topic (if available).
+        
+        Args:
+            domain: Domain number (domain_1 through domain_5)
+            topic: Topic name (e.g., security_controls, cryptography)
+        """
+        domain = domain.lower().replace(" ", "_")
+        topic = topic.lower().replace(" ", "_")
+        
+        if domain not in self.knowledge_base:
+            return "Use domain_1 through domain_5"
+        
+        domain_data = self.knowledge_base[domain]
+        
+        if topic not in domain_data["topics"]:
+            available = ", ".join(domain_data["topics"].keys())
+            return f"Available topics: {available}"
+        
+        topic_data = domain_data["topics"][topic]
+        
+        # Check if topic has a scripted lesson
+        if "scripted_lesson" not in topic_data:
+            return f"No scripted lesson available for {topic}. Try using 'teach_lesson' or 'explain_topic' instead."
+        
+        self.student_progress["topics_covered"].add(f"{domain}_{topic}")
+        
+        # Deliver the scripted lesson
+        lesson = f"📚 Scripted Lesson: {topic.replace('_', ' ').title()}\n\n"
+        lesson += f"Domain: {domain_data['name']}\n\n"
+        lesson += topic_data["scripted_lesson"]
+        
+        return lesson
 
     @function_tool
     async def quiz_me(self, context: RunContext, num_questions: int = 1) -> str:
@@ -517,22 +404,28 @@ class SecurityPlusTeacher(Agent):
 
 
 async def entrypoint(ctx: agents.JobContext):
-    """Entry point for the Security+ teaching agent."""
-    
+    """Entry point for the agent."""
+
+    # Configure the voice pipeline with the essentials
     session = AgentSession(
         stt=deepgram.STT(model="nova-2"),
-        llm=openai.LLM(model=os.getenv("LLM_CHOICE", "gpt-4o-mini")),
+        llm=openai.LLM(model=os.getenv("LLM_CHOICE", "gpt-4.1-mini")),
         tts=openai.TTS(voice="echo"),
         vad=silero.VAD.load(),
     )
 
+    # Start the session
     await session.start(
         room=ctx.room,
         agent=SecurityPlusTeacher()
     )
 
+    # Generate initial greeting
     await session.generate_reply(
-        instructions="Greet the student warmly and introduce yourself as their Security+ exam tutor. Ask what they'd like to study today."
+        instructions="""Greet the class warmly as a teacher would at the start of a lesson.
+        Introduce yourself as their Security+ instructor and welcome them to today's class.
+        Ask them what topic they'd like to cover today, or if they'd like you to start with a particular domain.
+        Be encouraging and create a classroom atmosphere."""
     )
 
 
