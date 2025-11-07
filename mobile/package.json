@@ -7,6 +7,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:dev": "eslint . --ext .js,.jsx,.ts,.tsx --config .eslintrc.dev.js",
     "start": "react-native start",
     "test": "jest",
     "build:android": "cd android && ./gradlew assembleRelease",
@@ -14,7 +15,8 @@
     "clean": "react-native clean",
     "pod-install": "cd ios && pod install",
     "setup": "npm install && cd ios && pod install && cd ..",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "type-check:dev": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
     "react": "18.2.0",

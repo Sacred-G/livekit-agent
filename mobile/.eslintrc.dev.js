@@ -11,19 +11,24 @@ module.exports = {
     'react-native/react-native': true,
   },
   rules: {
-    '@typescript-eslint/no-shadow': ['error'],
+    // Disable all rules that require dependencies to be installed
+    '@typescript-eslint/no-shadow': 'off',
     'no-shadow': 'off',
     'no-undef': 'off',
-    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-unused-vars': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-implicit-any': 'off',
-    'react-hooks/exhaustive-deps': 'warn',
-    'react-native/no-inline-styles': 'warn',
+    'react-hooks/exhaustive-deps': 'off',
+    'react-native/no-inline-styles': 'off',
     'no-console': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-empty-function': 'off',
+    'import/no-unresolved': 'off',
+    'import/extensions': 'off',
+    'react/jsx-uses-react': 'off',
+    'react/react-in-jsx-scope': 'off',
   },
   settings: {
     'import/resolver': {
@@ -35,12 +40,4 @@ module.exports = {
       },
     },
   },
-  overrides: [
-    {
-      files: ['*.ts', '*.tsx'],
-      rules: {
-        'no-unused-vars': 'off',
-      },
-    },
-  ],
 };

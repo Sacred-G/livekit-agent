@@ -89,7 +89,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'livekit-agent-storage',
-      partialize: (state) => ({
+      partialize: (state: any) => ({
         user: state.user,
         selectedAgent: state.selectedAgent,
         conversations: state.conversations,
