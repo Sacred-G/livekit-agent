@@ -18,7 +18,7 @@ interface Props {
 
 const { width, height } = Dimensions.get('window');
 
-const CallScreen: React.FC<Props> = ({ navigation }) => {
+const CallScreen: React.FC<Props> = ({ navigation }: Props) => {
   const { selectedAgent } = useAgents();
   const { 
     disconnect, 
@@ -39,7 +39,7 @@ const CallScreen: React.FC<Props> = ({ navigation }) => {
     let interval: NodeJS.Timeout;
     if (isInCall) {
       interval = setInterval(() => {
-        setCallDuration(prev => prev + 1);
+        setCallDuration((prev: number) => prev + 1);
       }, 1000);
     }
     return () => clearInterval(interval);

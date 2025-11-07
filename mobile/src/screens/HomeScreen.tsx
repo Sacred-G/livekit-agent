@@ -16,7 +16,7 @@ interface Props {
   navigation: any;
 }
 
-const HomeScreen: React.FC<Props> = ({ navigation }) => {
+const HomeScreen: React.FC<Props> = ({ navigation }: Props) => {
   const { availableAgents, selectedAgent, setSelectedAgent } = useAgents();
   const { user } = useAuth();
   const { connectToAgent, connectionState } = useLiveKit();

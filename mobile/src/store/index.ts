@@ -34,7 +34,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set, get) => ({
+    (set: any, get: any) => ({
       // Initial state
       user: null,
       isAuthenticated: false,
@@ -46,22 +46,22 @@ export const useAppStore = create<AppState>()(
       isSettingsOpen: false,
 
       // User actions
-      setUser: (user) => set({ user }),
-      setAuthenticated: (authenticated) => set({ isAuthenticated: authenticated }),
+      setUser: (user: User | null) => set({ user }),
+      setAuthenticated: (authenticated: boolean) => set({ isAuthenticated: authenticated }),
       
       // Agent actions
-      setAvailableAgents: (agents) => set({ availableAgents: agents }),
-      setSelectedAgent: (agent) => set({ selectedAgent: agent }),
+      setAvailableAgents: (agents: Agent[]) => set({ availableAgents: agents }),
+      setSelectedAgent: (agent: Agent | null) => set({ selectedAgent: agent }),
       
       // Conversation actions
-      addConversation: (conversation) => 
-        set((state) => ({ 
+      addConversation: (conversation: Conversation) => 
+        set((state: any) => ({ 
           conversations: [conversation, ...state.conversations] 
         })),
       
-      updateConversation: (id, updates) =>
-        set((state) => ({
-          conversations: state.conversations.map(conv =>
+      updateConversation: (id: string, updates: Partial<Conversation>) =>
+        set((state: any) => ({
+          conversations: state.conversations.map((conv: any) =>
             conv.id === id ? { ...conv, ...updates } : conv
           ),
           currentConversation: 
@@ -70,15 +70,15 @@ export const useAppStore = create<AppState>()(
               : state.currentConversation
         })),
       
-      setCurrentConversation: (conversation) => set({ currentConversation: conversation }),
+      setCurrentConversation: (conversation: Conversation | null) => set({ currentConversation: conversation }),
       
       // UI actions
-      setVoiceMode: (enabled) => set({ isVoiceMode: enabled }),
-      setSettingsOpen: (open) => set({ isSettingsOpen: open }),
+      setVoiceMode: (enabled: boolean) => set({ isVoiceMode: enabled }),
+      setSettingsOpen: (open: boolean) => set({ isSettingsOpen: open }),
       
       // User preferences
-      updateUserPreferences: (preferences) =>
-        set((state) => ({
+      updateUserPreferences: (preferences: Partial<UserPreferences>) =>
+        set((state: any) => ({
           user: state.user 
             ? { 
                 ...state.user, 

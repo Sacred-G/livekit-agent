@@ -15,7 +15,7 @@ interface Props {
   navigation: any;
 }
 
-const SettingsScreen: React.FC<Props> = ({ navigation }) => {
+const SettingsScreen: React.FC<Props> = ({ navigation }: Props) => {
   const { user, setAuthenticated } = useAuth();
   const { preferences, updateUserPreferences } = useUserPreferences();
   const [serverUrl, setServerUrl] = useState('wss://your-livekit-server.com');

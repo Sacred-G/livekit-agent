@@ -9,6 +9,10 @@ A LiveKit-powered voice AI agent framework that demonstrates how to build realti
 - 🛠️ Tool integration via MCP servers
 - 🎯 Multiple provider options (OpenAI, Deepgram, Cartesia, etc.)
 - 🔌 Extensible architecture for custom tools and agents
+- 📱 **NEW**: React Native mobile app for iOS/Android
+- 📊 Conversation history and management
+- 🔔 Push notifications support
+- 🔐 User authentication options
 
 ## Prerequisites
 
@@ -19,6 +23,8 @@ A LiveKit-powered voice AI agent framework that demonstrates how to build realti
   - LiveKit credentials (optional - only if deploying to LiveKit Cloud)
 
 ## Quick Start
+
+### 🖥️ Backend Setup
 
 ### 1. Install Dependencies
 
@@ -71,6 +77,34 @@ uv run python livekit_basic_agent.py dev
 # Production mode
 uv run python livekit_basic_agent.py start
 ```
+
+### 📱 Mobile App Setup
+
+**NEW**: React Native mobile app for iOS and Android!
+
+```bash
+# Navigate to mobile directory
+cd mobile
+
+# Quick setup (installs dependencies and iOS pods)
+npm run setup
+
+# Or use the installation script
+./install.sh
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your LiveKit server details
+
+# Run the app
+npm run ios    # iOS (macOS only)
+npm run android # Android
+```
+
+For detailed mobile setup instructions, see:
+- [mobile/QUICK_START.md](./mobile/QUICK_START.md) - Quick start guide
+- [mobile/SETUP.md](./mobile/SETUP.md) - Detailed setup
+- [MOBILE_INTEGRATION.md](./MOBILE_INTEGRATION.md) - Backend integration guide
 
 ## Architecture
 

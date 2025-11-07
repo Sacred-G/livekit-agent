@@ -16,7 +16,7 @@ interface Props {
   navigation: any;
 }
 
-const HistoryScreen: React.FC<Props> = ({ navigation }) => {
+const HistoryScreen: React.FC<Props> = ({ navigation }: Props) => {
   const { conversations } = useConversations();
   const [loading, setLoading] = useState(true);
 
