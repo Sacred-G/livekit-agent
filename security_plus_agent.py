@@ -8,11 +8,13 @@ from dotenv import load_dotenv
 from livekit import agents
 from livekit.agents import Agent, AgentSession, RunContext
 from livekit.agents.llm import function_tool
-from livekit.plugins import openai, deepgram, silero
+from livekit.plugins import openai, deepgram, silero, anam
 import os
 import random
+import hashlib
 from domains import ALL_DOMAINS
 from security_plus_knowledge_base import PRACTICE_QUESTIONS
+from session_persistence import SessionPersistence
 
 # Load environment variables
 load_dotenv(".env")
@@ -25,6 +27,17 @@ class SecurityPlusTeacher(Agent):
             instructions="""
 You are a certified CompTIA Security+ instructor conducting an engaging, voice-based class.  
 You are beginning a live CompTIA Security+ class. Introduce yourself as the instructor and start the first session naturally, just as a real teacher would at the beginning of a course. Speak with warmth, confidence, and clear pacing.
+[SPEAKING STYLE]
+You should attempt to understand the user's spoken requests, even if the speech-to-text transcription contains errors. Your responses will be converted to speech using a text-to-speech system. Therefore, your output must be plain, unformatted text.
+
+When you receive a transcribed user request:
+
+1. Silently correct for likely transcription errors. Focus on the intended meaning, not the literal text. If a word sounds like another word in the given context, infer and correct. For example, if the transcription says "buy milk two tomorrow" interpret this as "buy milk tomorrow".
+2. Provide short, direct answers unless the user explicitly asks for a more detailed response. For example, if the user asks "Tell me a joke", you should provide a short joke.
+3. Always prioritize clarity and accuracy. Respond in plain text, without any formatting, bullet points, or extra conversational filler.
+4. Occasionally add a pause "..." or disfluency eg., "Um" or "Erm."
+
+Your output will be directly converted to speech, so your response should be natural-sounding and appropriate for a spoken conversation.
 
 Your introduction should:
 1. Greet the class naturally. Vary how you open each time (examples: "Good morning everyone", "Hey folks, welcome in", "Alright team, let's get started").
@@ -34,6 +47,12 @@ Your introduction should:
 5. Add small, human details that sound spontaneous ("Let me grab a sip of water", "If you have a notebook handy, go ahead and open it").
 6. Use natural pauses and phrasing cues like [break:1s] and [break:2s] to allow for realism in delivery.
 7. End your introduction by smoothly transitioning into the first topic — don't sound robotic or read off bullet points.
+
+Session Continuity:
+- If returning student, acknowledge previous topics covered and progress made
+- Reference recent lessons or quiz results to maintain continuity
+- Suggest building on previous knowledge or reviewing difficult concepts
+- Remember student's learning pace and preferences
 
 Example pattern (do not repeat exactly):
 "Good morning, everyone! [break:1s] My name is Alex, and I'll be your instructor for the CompTIA Security+ course. I'm really excited to walk you through some core cybersecurity concepts — we'll break things down piece by piece, and I promise to keep it approachable. [break:1s] Today, we'll start with the fundamentals: understanding what security actually means, and the principles that guide it — confidentiality, integrity, and availability. [break:1s] Make sure you've got a way to take notes; I'll pause along the way so you can jot down the key points. [break:2s] Alright, let's dive in."
@@ -121,16 +140,48 @@ Vary structure, tone, and pacing naturally so the class feels spontaneous and re
 """
 )
 
-
+        # Initialize session persistence
+        self.persistence = SessionPersistence()
+        self.session_id = "default_user"  # Could be based on user ID, room name, etc.
+        
+        # Load previous session data if available
+        previous_data = self.persistence.load_session(self.session_id)
+        if previous_data:
+            self.student_progress = previous_data.get("student_progress", {
+                "questions_answered": 0,
+                "correct_answers": 0,
+                "topics_covered": set()
+            })
+            # Convert list back to set for topics_covered
+            if isinstance(self.student_progress["topics_covered"], list):
+                self.student_progress["topics_covered"] = set(self.student_progress["topics_covered"])
+        else:
+            self.student_progress = {
+                "questions_answered": 0,
+                "correct_answers": 0,
+                "topics_covered": set()
+            }
 
         # Initialize knowledge base and tracking from imported data
         self.knowledge_base = ALL_DOMAINS
         self.practice_questions = PRACTICE_QUESTIONS
-        self.student_progress = {
-            "questions_answered": 0,
-            "correct_answers": 0,
-            "topics_covered": set()
+
+    def save_progress(self):
+        """Save current student progress to persistent storage."""
+        # Convert set to list for JSON serialization
+        progress_to_save = self.student_progress.copy()
+        progress_to_save["topics_covered"] = list(self.student_progress["topics_covered"])
+        
+        session_data = {
+            "student_progress": progress_to_save,
+            "last_session": {
+                "questions_answered": self.student_progress["questions_answered"],
+                "correct_answers": self.student_progress["correct_answers"],
+                "topics_count": len(self.student_progress["topics_covered"])
+            }
         }
+        
+        self.persistence.save_session(self.session_id, session_data)
 
     @function_tool
     async def get_exam_overview(self, context: RunContext) -> str:
@@ -168,6 +219,7 @@ Vary structure, tone, and pacing naturally so the class feels spontaneous and re
         
         topic_data = domain_data["topics"][topic]
         self.student_progress["topics_covered"].add(f"{domain}_{topic}")
+        self.save_progress()  # Save progress to persistent storage
         
         explanation = f"📚 {topic.replace('_', ' ').title()}\n\n"
         explanation += f"{topic_data.get('description', '')}\n\n"
@@ -234,6 +286,7 @@ Vary structure, tone, and pacing naturally so the class feels spontaneous and re
         
         topic_data = domain_data["topics"][topic]
         self.student_progress["topics_covered"].add(f"{domain}_{topic}")
+        self.save_progress()  # Save progress to persistent storage
         
         lesson = f"📚 Today's Lesson: {topic.replace('_', ' ').title()}\n\n"
         lesson += f"Alright class, today we're going to cover {topic.replace('_', ' ')}. This is an important topic for your Security+ exam.\n\n"
@@ -295,6 +348,7 @@ Vary structure, tone, and pacing naturally so the class feels spontaneous and re
             return f"No scripted lesson available for {topic}. Try using 'teach_lesson' or 'explain_topic' instead."
         
         self.student_progress["topics_covered"].add(f"{domain}_{topic}")
+        self.save_progress()  # Save progress to persistent storage
         
         # Deliver the scripted lesson
         lesson = f"📚 Scripted Lesson: {topic.replace('_', ' ').title()}\n\n"
@@ -369,6 +423,7 @@ Vary structure, tone, and pacing naturally so the class feels spontaneous and re
             results += "📚 Keep studying!"
         
         context.store_metadata("current_quiz", None)
+        self.save_progress()  # Save progress to persistent storage
         return results
 
     @function_tool
@@ -384,6 +439,40 @@ Vary structure, tone, and pacing naturally so the class feels spontaneous and re
         tips += "7. Performance-based questions come first\n"
         tips += "8. Flag difficult questions and return later\n"
         return tips
+
+    @function_tool
+    async def get_session_history(self, context: RunContext) -> str:
+        """Check your learning history and previous sessions."""
+        sessions = self.persistence.list_sessions()
+        
+        if not sessions:
+            return "📝 No previous sessions found. This appears to be your first time studying!"
+        
+        history = "📚 Your Learning History:\n\n"
+        
+        for session in sessions[:5]:  # Show last 5 sessions
+            session_id = session["session_id"]
+            session_data = self.persistence.load_session(session_id)
+            
+            if session_data:
+                last_session = session_data.get("last_session", {})
+                history += f"Session: {session_id}\n"
+                history += f"• Questions Answered: {last_session.get('questions_answered', 0)}\n"
+                history += f"• Correct Answers: {last_session.get('correct_answers', 0)}\n"
+                history += f"• Topics Covered: {last_session.get('topics_count', 0)}\n"
+                history += f"• Last Updated: {session.get('last_updated', 'Unknown')}\n\n"
+        
+        # Add current session info
+        history += "📈 Current Session Progress:\n"
+        history += f"• Questions Answered: {self.student_progress['questions_answered']}\n"
+        history += f"• Correct Answers: {self.student_progress['correct_answers']}\n"
+        history += f"• Topics Covered: {len(self.student_progress['topics_covered'])}\n"
+        
+        if self.student_progress['questions_answered'] > 0:
+            accuracy = (self.student_progress['correct_answers'] / self.student_progress['questions_answered']) * 100
+            history += f"• Current Accuracy: {accuracy:.1f}%\n"
+        
+        return history
 
     @function_tool
     async def get_progress(self, context: RunContext) -> str:
@@ -402,28 +491,51 @@ Vary structure, tone, and pacing naturally so the class feels spontaneous and re
         
         return progress
 
+    @function_tool
+    async def analyze_screen(self, context: RunContext) -> str:
+        """Analyze what the user is sharing on their screen.
+        
+        Use this when the user asks you to look at their screen, 
+        analyze what they're showing, or comment on visual content.
+        """
+        # This function will be triggered when user shares screen
+        # The vision capabilities are now enabled in the session
+        return "I can see your screen now! Please tell me what you'd like me to analyze or explain about what you're sharing."
+
 
 async def entrypoint(ctx: agents.JobContext):
-    """Entry point for the agent."""
-
-    # Configure the voice pipeline with the essentials
+    """Entry point for the agent with working audio configuration."""
+    
+    print(f"🎓 Security+ agent starting in room: {ctx.room.name}")
+    
+    # Configure the voice pipeline with vision capabilities
     session = AgentSession(
         stt=deepgram.STT(model="nova-2"),
-        llm=openai.LLM(model=os.getenv("LLM_CHOICE", "gpt-4.1-mini")),
-        tts=openai.TTS(voice="echo"),
+        llm=openai.LLM(model="gpt-4o"),  # Vision-capable model
+        tts=openai.TTS(voice="echo"),  # Echo voice works well
         vad=silero.VAD.load(),
     )
 
-    # Start the session
+    # Start the session with audio and video enabled
     await session.start(
         room=ctx.room,
-        agent=SecurityPlusTeacher()
+        agent=SecurityPlusTeacher(),
+        room_input_options=agents.RoomInputOptions(
+            video_enabled=True,  # Enable video input for screen sharing
+            close_on_disconnect=False,  # Keep agent running when user disconnects
+        ),
+        room_output_options=agents.RoomOutputOptions(
+            audio_enabled=True,  # Audio output enabled
+        )
     )
 
+    print("✅ Security+ agent started successfully!")
+    
     # Generate initial greeting
     await session.generate_reply(
         instructions="""Greet the class warmly as a teacher would at the start of a lesson.
         Introduce yourself as their Security+ instructor and welcome them to today's class.
+        Mention that you can see their screen if they share it, which is great for diagrams, configurations, or practice questions.
         Ask them what topic they'd like to cover today, or if they'd like you to start with a particular domain.
         Be encouraging and create a classroom atmosphere."""
     )

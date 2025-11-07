@@ -1,0 +1,20 @@
+# LiveKit Agent Configuration
+
+[project]
+# Use the project that matches the LiveKit URL
+name = "voice-agent-fp2twjb1"
+
+[agent]
+name = "security-plus-agent"
+entry_point = "security_plus_agent.py"
+
+[runtime]
+python_version = "3.13"
+
+[secrets]
+OPENAI_API_KEY = "${OPENAI_API_KEY}"
+DEEPGRAM_API_KEY = "${DEEPGRAM_API_KEY}"
+ANAM_API_KEY = "${ANAM_API_KEY}"
+LIVEKIT_API_KEY = "${LIVEKIT_API_KEY}"
+LIVEKIT_API_SECRET = "${LIVEKIT_API_SECRET}"
+LIVEKIT_URL = "${LIVEKIT_URL}"

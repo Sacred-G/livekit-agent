@@ -1,0 +1,18 @@
+{
+  "session_id": "default_user",
+  "last_updated": "2025-11-05T08:11:37.710486",
+  "data": {
+    "student_progress": {
+      "questions_answered": 0,
+      "correct_answers": 0,
+      "topics_covered": [
+        "domain_1_security_controls"
+      ]
+    },
+    "last_session": {
+      "questions_answered": 0,
+      "correct_answers": 0,
+      "topics_count": 1
+    }
+  }
+}
