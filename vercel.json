@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "env": {
+    "LIVEKIT_HOST": "@livekit_cloud_host",
+    "LIVEKIT_API_KEY": "@livekit_cloud_api_key", 
+    "LIVEKIT_API_SECRET": "@livekit_cloud_api_secret"
+  },
+  "functions": {
+    "app/api/token/route.ts": {
+      "maxDuration": 10
+    }
+  }
+}
