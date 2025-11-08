@@ -40,7 +40,8 @@ export function WelcomeScreen({ onJoinRoom }: WelcomeScreenProps) {
       onJoinRoom(livekitUrl, token)
     } catch (error) {
       console.error('Failed to connect:', error)
-      alert(`Failed to connect: ${error.message}. Please try again.`)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      alert(`Failed to connect: ${errorMessage}. Please try again.`)
     } finally {
       setIsConnecting(false)
     }
@@ -99,10 +100,10 @@ export function WelcomeScreen({ onJoinRoom }: WelcomeScreenProps) {
         </div>
 
         <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <h3 className="font-semibold text-blue-900 mb-2">🎓 What you'll experience:</h3>
+          <h3 className="font-semibold text-blue-900 mb-2">🎓 What you&apos;ll experience:</h3>
           <ul className="text-sm text-blue-800 space-y-1">
             <li>• Live voice instruction from Security+ expert</li>
-            <li>• Interactive Q&A sessions</li>
+            <li>• Interactive Q&amp;A sessions</li>
             <li>• Real-time exam practice questions</li>
             <li>• Personalized learning experience</li>
             <li>• Powered by LiveKit Cloud for crystal-clear audio</li>
@@ -112,7 +113,7 @@ export function WelcomeScreen({ onJoinRoom }: WelcomeScreenProps) {
         <div className="mt-4 p-4 bg-green-50 rounded-lg">
           <h3 className="font-semibold text-green-900 mb-2">✅ Ready to start learning</h3>
           <p className="text-sm text-green-800">
-            Just enter your name above and click "Join Security+ Class" to begin your session.
+            Just enter your name above and click &quot;Join Security+ Class&quot; to begin your session.
           </p>
         </div>
       </div>

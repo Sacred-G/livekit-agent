@@ -121,7 +121,7 @@ export function SecurityPlusRoom({ livekitUrl, token, onLeaveRoom }: SecurityPlu
           <div className="mt-6 p-4 bg-green-50 rounded-lg">
             <h3 className="font-semibold text-green-900 mb-2">Session Active</h3>
             <p className="text-sm text-green-800">
-              You're connected to the Security+ exam preparation session. 
+              You&apos;re connected to the Security+ exam preparation session. 
               Your instructor will guide you through the material and answer your questions.
             </p>
           </div>
